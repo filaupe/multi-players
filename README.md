@@ -1,70 +1,52 @@
-# Getting Started with Create React App
+# Multi-Players Game
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Um jogo multiplayer 3D desenvolvido com React, Three.js e Socket.IO.
 
-## Available Scripts
+## Configuração Inicial
 
-In the project directory, you can run:
+Antes de iniciar o jogo, é necessário extrair os modelos 3D dos arquivos ZIP. Siga os passos abaixo:
 
-### `npm start`
+1. Instale as dependências:
+   ```
+   npm install
+   ```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+2. Execute o script de extração de modelos:
+   ```
+   npm run extract-models
+   ```
+   Este script extrairá os arquivos GLTF dos arquivos ZIP na pasta `src/assets/models/cars` e os colocará nas pastas corretas em `public/models/cars` para serem usados pelo jogo.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+3. Inicie o jogo:
+   ```
+   npm start
+   ```
 
-### `npm test`
+## Solução de Problemas
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Modelos 3D não aparecem
 
-### `npm run build`
+Se os modelos 3D não aparecerem, verifique se:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. O script de extração foi executado com sucesso
+2. Os arquivos GLTF foram extraídos corretamente para as pastas em `public/models/cars`
+3. Cada pasta de carro contém um arquivo `scene.gltf`
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Se ainda houver problemas, o jogo usará automaticamente um modelo de fallback para garantir que você possa jogar mesmo sem os modelos 3D.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Desenvolvimento
 
-### `npm run eject`
+### Estrutura de Pastas
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- `public/models/cars/`: Contém os modelos 3D dos carros
+- `src/assets/models/cars/`: Contém os arquivos ZIP originais dos modelos
+- `src/components/`: Componentes React do jogo
+- `scripts/`: Scripts utilitários, como o script de extração de modelos
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Adicionando Novos Modelos
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Para adicionar novos modelos de carros:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+1. Adicione o arquivo ZIP do modelo na pasta `src/assets/models/cars/`
+2. Adicione o modelo na lista em `src/assets/models/cars/index.js`
+3. Execute o script de extração: `npm run extract-models`

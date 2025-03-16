@@ -1,0 +1,246 @@
+/* Estilos para o painel de controles do jogo */
+.game-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.control-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.control-button:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  transform: scale(1.05);
+}
+
+.control-button.active {
+  background-color: rgba(255, 0, 0, 0.6);
+}
+
+.control-button i {
+  font-size: 18px;
+}
+
+/* Estilos para o botão de configurações */
+.settings-panel {
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+  padding: 15px;
+  width: 250px;
+  color: white;
+  z-index: 999;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  display: none;
+}
+
+.settings-panel.visible {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+.settings-panel h3 {
+  margin-bottom: 15px;
+  font-family: 'Orbitron', sans-serif;
+  text-align: center;
+  font-size: 18px;
+}
+
+.settings-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.settings-option label {
+  font-size: 14px;
+}
+
+/* Estilos para os interruptores (toggles) */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-switch label {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #444;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.toggle-switch label:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+.toggle-switch input:checked + label {
+  background-color: #3a6df0;
+}
+
+.toggle-switch input:checked + label:before {
+  transform: translateX(26px);
+}
+
+/* Estilos para os selects e ranges */
+.settings-option select,
+.settings-option input[type="range"] {
+  background-color: #333;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 5px;
+  width: 120px;
+}
+
+.settings-option input[type="range"] {
+  -webkit-appearance: none;
+  height: 8px;
+  background: #333;
+  border-radius: 5px;
+  outline: none;
+}
+
+.settings-option input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #3a6df0;
+  cursor: pointer;
+}
+
+/* Estilos para o popup de confirmação */
+.confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.confirmation-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.confirmation-dialog {
+  background-color: rgba(30, 30, 40, 0.95);
+  border: 2px solid rgba(100, 100, 255, 0.8);
+  border-radius: 10px;
+  padding: 25px;
+  width: 350px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 0 20px rgba(0, 100, 255, 0.5);
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.confirmation-overlay.visible .confirmation-dialog {
+  transform: scale(1);
+}
+
+.confirmation-dialog h3 {
+  margin-bottom: 15px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 20px;
+}
+
+.confirmation-dialog p {
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.confirmation-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.confirmation-button {
+  padding: 10px 25px;
+  border-radius: 5px;
+  border: none;
+  font-family: 'Poppins', sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.confirmation-button.yes {
+  background-color: #3a6df0;
+  color: white;
+}
+
+.confirmation-button.no {
+  background-color: #444;
+  color: white;
+}
+
+.confirmation-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.confirmation-button.yes:hover {
+  background-color: #2a5de0;
+}
+
+.confirmation-button.no:hover {
+  background-color: #555;
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

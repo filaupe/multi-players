@@ -3,7 +3,7 @@ import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 
-function FollowOrbitControls({ playerRef, distance = 10 }) {
+function FollowOrbitControls({ playerRef, distance = 10, minDistance = 5, maxDistance = 20 }) {
   const orbitRef = useRef();
 
   useFrame(() => {
@@ -21,8 +21,9 @@ function FollowOrbitControls({ playerRef, distance = 10 }) {
   return (
     <OrbitControls
       ref={orbitRef}
-      minDistance={distance}
-      maxDistance={distance}
+      minDistance={minDistance}
+      maxDistance={maxDistance}
+      initialDistance={distance}
     />
   );
 }

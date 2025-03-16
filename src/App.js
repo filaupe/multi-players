@@ -1,31 +1,53 @@
 // App.js
-import React, { useState } from 'react';
-import PlayerForm from './components/PlayerForm';
+import React, { useState, useEffect } from 'react';
+import HomeScreen from './screens/HomeScreen';
 import MainScene from './scenes/MainScene';
+import { audioManager, relaxingGuitar } from './assets/audio';
+import './App.css';
 
 function App() {
   const [playerName, setPlayerName] = useState('');
+  const [playerColor, setPlayerColor] = useState('red');
+  const [playerCar, setPlayerCar] = useState('carro-vermelho');
   // Se "gameOver" for true, mostramos a tela de Game Over ou voltamos para o login
   const [gameOver, setGameOver] = useState(false);
 
+  // Quando o jogo termina, esta função é chamada
+  const handleGameOver = () => {
+    setGameOver(true);
+    
+    // Reinicia a música da tela inicial
+    if (!audioManager.sounds['homeMusic']) {
+      audioManager.loadSound('homeMusic', relaxingGuitar);
+    }
+    audioManager.playMusic('homeMusic');
+  };
+
+  // Quando o jogador clica para jogar novamente
   const handlePlayAgain = () => {
-    // Reseta o estado para forçar o jogador a inserir nome novamente
-    setPlayerName('');
     setGameOver(false);
   };
 
   return (
-    <>
+    <div className="App">
       {playerName === '' || gameOver ? (
-        <PlayerForm setPlayerName={setPlayerName} />
+        <HomeScreen 
+          setPlayerName={setPlayerName} 
+          setPlayerColor={setPlayerColor}
+          setPlayerCar={setPlayerCar}
+          isGameOver={gameOver}
+          onPlayAgain={handlePlayAgain}
+          playerNameValue={playerName}
+        />
       ) : (
         <MainScene
           playerName={playerName}
-          onGameOver={() => setGameOver(true)}
+          playerColor={playerColor}
+          playerCar={playerCar}
+          onGameOver={handleGameOver}
         />
       )}
-      {/* Se preferir, pode exibir um modal de Game Over em vez de voltar direto ao login */}
-    </>
+    </div>
   );
 }
 

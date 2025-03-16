@@ -1,43 +1,36 @@
+// server/server.js
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+const config = require('./config/config');
+const socketController = require('./controllers/socketController');
+const { getLocalIpAddress } = require('./getLocalIp');
 
+// Inicializa o servidor Express
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, { cors: { origin: "*" } });
 
-const players = {};
+// Configura o Socket.IO com CORS
+const io = socketIo(server, { cors: config.CORS });
 
-io.on('connection', (socket) => {
-  console.log('Novo cliente conectado: ' + socket.id);
-
-  // Quando um novo jogador se conecta
-  socket.on('newPlayer', (data) => {
-    players[socket.id] = { id: socket.id, name: data.name, position: [0, 1, 0] };
-    
-    // Envia para o novo jogador a lista de jogadores existentes
-    socket.emit('existingPlayers', players);
-    
-    // Notifica os demais jogadores sobre o novo jogador
-    socket.broadcast.emit('playerJoined', players[socket.id]);
-  });
-
-  // Atualização de posição do jogador
-  socket.on('playerMovement', (data) => {
-    if (players[socket.id]) {
-      players[socket.id].position = data.position;
-      // Notifica os outros jogadores sobre a movimentação
-      socket.broadcast.emit('playerMoved', { id: socket.id, position: data.position });
-    }
-  });
-
-  socket.on('disconnect', () => {
-    console.log('Cliente desconectado: ' + socket.id);
-    delete players[socket.id];
-    socket.broadcast.emit('playerDisconnected', socket.id);
-  });
+// Rota básica para verificar se o servidor está rodando
+app.get('/', (req, res) => {
+  res.send('Servidor de multiplayer está rodando!');
 });
 
-server.listen(4000, () => {
-  console.log('Servidor rodando na porta 4000');
+// Manipula conexões de socket
+io.on('connection', (socket) => {
+  socketController.handleConnection(socket, io);
+});
+
+// Inicia o servidor
+server.listen(config.PORT, '0.0.0.0', () => {
+  const localIp = getLocalIpAddress();
+  console.log(`\n===== SERVIDOR MULTIPLAYER INICIADO =====`);
+  console.log(`Servidor rodando na porta ${config.PORT}`);
+  console.log(`Endereço local: http://localhost:${config.PORT}`);
+  console.log(`Endereço na rede: http://${localIp}:${config.PORT}`);
+  console.log(`\nPara que outros jogadores se conectem, eles devem usar:`);
+  console.log(`http://${localIp}:${config.PORT}`);
+  console.log(`===========================================\n`);
 });
