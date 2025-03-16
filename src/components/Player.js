@@ -9,56 +9,148 @@ import React, {
 } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { RigidBody } from '@react-three/rapier';
-import { Billboard, Text, ContactShadows } from '@react-three/drei';
+import { Billboard, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { getCarById } from '../assets/models/cars';
+import { useCarPhysics } from '../hooks/useCarPhysics';
+import { PLAYER_CONFIG } from '../config/constants';
+import CarModel from './cars/CarModel';
 
 // Modelo de fallback para quando o modelo 3D não puder ser carregado
 const FallbackCarModel = ({ color }) => {
   return (
-    <group rotation={[0, Math.PI, 0]}>
+    <group>
+      {/* Corpo principal do carro */}
       <mesh castShadow receiveShadow>
         <boxGeometry args={[1, 0.5, 2]} />
         <meshStandardMaterial color={color || "#FF0000"} metalness={0.6} roughness={0.4} />
       </mesh>
       
       {/* Rodas */}
-      <mesh position={[-0.5, -0.3, 0.7]} castShadow>
-        <boxGeometry args={[0.3, 0.3, 0.3]} />
-        <meshStandardMaterial color="#333333" />
-      </mesh>
-      <mesh position={[0.5, -0.3, 0.7]} castShadow>
-        <boxGeometry args={[0.3, 0.3, 0.3]} />
-        <meshStandardMaterial color="#333333" />
-      </mesh>
-      <mesh position={[-0.5, -0.3, -0.7]} castShadow>
-        <boxGeometry args={[0.3, 0.3, 0.3]} />
-        <meshStandardMaterial color="#333333" />
-      </mesh>
-      <mesh position={[0.5, -0.3, -0.7]} castShadow>
-        <boxGeometry args={[0.3, 0.3, 0.3]} />
-        <meshStandardMaterial color="#333333" />
-      </mesh>
+      <group position={[-0.5, -0.3, 0.7]}>
+        <mesh castShadow rotation={[0, 0, Math.PI/2]}>
+          <cylinderGeometry args={[0.2, 0.2, 0.2, 16]} />
+          <meshStandardMaterial color="#333333" />
+        </mesh>
+      </group>
+      
+      <group position={[0.5, -0.3, 0.7]}>
+        <mesh castShadow rotation={[0, 0, Math.PI/2]}>
+          <cylinderGeometry args={[0.2, 0.2, 0.2, 16]} />
+          <meshStandardMaterial color="#333333" />
+        </mesh>
+      </group>
+      
+      <group position={[-0.5, -0.3, -0.7]}>
+        <mesh castShadow rotation={[0, 0, Math.PI/2]}>
+          <cylinderGeometry args={[0.2, 0.2, 0.2, 16]} />
+          <meshStandardMaterial color="#333333" />
+        </mesh>
+      </group>
+      
+      <group position={[0.5, -0.3, -0.7]}>
+        <mesh castShadow rotation={[0, 0, Math.PI/2]}>
+          <cylinderGeometry args={[0.2, 0.2, 0.2, 16]} />
+          <meshStandardMaterial color="#333333" />
+        </mesh>
+      </group>
       
       {/* Janelas */}
       <mesh position={[0, 0.2, 0]} castShadow>
         <boxGeometry args={[0.9, 0.3, 0.8]} />
         <meshStandardMaterial color="#87CEEB" metalness={0.8} roughness={0.2} />
       </mesh>
+      
+      {/* Lanternas dianteiras (amarelas) - na frente do carro (Z positivo) */}
+      <mesh position={[-0.35, 0, 0.95]} castShadow>
+        <boxGeometry args={[0.2, 0.15, 0.1]} />
+        <meshStandardMaterial color="#FFCC00" emissive="#FFCC00" emissiveIntensity={0.5} />
+      </mesh>
+      <mesh position={[0.35, 0, 0.95]} castShadow>
+        <boxGeometry args={[0.2, 0.15, 0.1]} />
+        <meshStandardMaterial color="#FFCC00" emissive="#FFCC00" emissiveIntensity={0.5} />
+      </mesh>
+      
+      {/* Lanternas traseiras (vermelhas) - na traseira do carro (Z negativo) */}
+      <mesh position={[-0.35, 0, -0.95]} castShadow>
+        <boxGeometry args={[0.2, 0.15, 0.1]} />
+        <meshStandardMaterial color="#FF0000" emissive="#FF0000" emissiveIntensity={0.5} />
+      </mesh>
+      <mesh position={[0.35, 0, -0.95]} castShadow>
+        <boxGeometry args={[0.2, 0.15, 0.1]} />
+        <meshStandardMaterial color="#FF0000" emissive="#FF0000" emissiveIntensity={0.5} />
+      </mesh>
+      
+      {/* Para-choque dianteiro - na frente do carro (Z positivo) */}
+      <mesh position={[0, -0.1, 0.9]} castShadow>
+        <boxGeometry args={[0.8, 0.1, 0.2]} />
+        <meshStandardMaterial color="#444444" />
+      </mesh>
     </group>
   );
 };
 
 // Componente para carregar o modelo do carro
-const CarModel = ({ carId, color }) => {
-  const car = getCarById(carId || 'carro-vermelho');
+const CarModelLoader = ({ carId, color }) => {
+  const car = getCarById(carId || 'red-car');
   const carColor = color || (car ? car.color : "#FF0000");
   
-  // Sempre use o fallback model
-  return <FallbackCarModel color={carColor} />;
+  return <CarModel color={carColor} id={carId} />;
 };
 
-const Player = forwardRef(({ playerName, playerColor, playerCar, multiplayer, onGameOver }, ref) => {
+// Componente de UI para mostrar informações do carro
+const CarUI = ({ isDrifting, isFlying, speed }) => {
+  return (
+    <Billboard position={[0, 2.2, 0]}>
+      <group>
+        {/* Velocidade */}
+        <Text 
+          fontSize={0.3} 
+          color="white" 
+          anchorX="center" 
+          anchorY="middle"
+          outlineWidth={0.05}
+          outlineColor="black"
+          position={[0, 0, 0]}
+        >
+          {`${speed} km/h`}
+        </Text>
+        
+        {/* Indicador de Drift */}
+        {isDrifting && (
+          <Text 
+            fontSize={0.25} 
+            color="#FF5500" 
+            anchorX="center" 
+            anchorY="middle"
+            outlineWidth={0.05}
+            outlineColor="black"
+            position={[0, -0.3, 0]}
+          >
+            DRIFT!
+          </Text>
+        )}
+        
+        {/* Indicador de Voo */}
+        {isFlying && (
+          <Text 
+            fontSize={0.25} 
+            color="#00AAFF" 
+            anchorX="center" 
+            anchorY="middle"
+            outlineWidth={0.05}
+            outlineColor="black"
+            position={[0, -0.3, 0]}
+          >
+            AIR!
+          </Text>
+        )}
+      </group>
+    </Billboard>
+  );
+};
+
+const Player = forwardRef(({ playerName, playerColor, playerCar, multiplayer, onGameOver, onHUDUpdate }, ref) => {
   const rigidBodyRef = useRef(null);
   const meshRef = useRef(null);
   const keysRef = useRef({});
@@ -70,6 +162,16 @@ const Player = forwardRef(({ playerName, playerColor, playerCar, multiplayer, on
 
   // Cria um objeto dummy para rastrear a posição do player
   const dummyRef = useRef(new THREE.Object3D());
+
+  // Usa o hook de física do carro
+  const { 
+    updateCarPhysics, 
+    handleRampCollision, 
+    updateGroundedState,
+    isDrifting,
+    isFlying,
+    currentSpeed
+  } = useCarPhysics();
 
   // Expor o dummy através de getMesh para que a câmera possa usar sua posição
   useImperativeHandle(ref, () => ({
@@ -97,6 +199,11 @@ const Player = forwardRef(({ playerName, playerColor, playerCar, multiplayer, on
     // Atualiza a posição do dummy para a posição atual do rigidBody
     const pos = rigidBodyRef.current.translation();
     dummyRef.current.position.set(pos.x, pos.y, pos.z);
+    
+    // Também atualiza a rotação do dummy para corresponder à rotação do mesh
+    if (meshRef.current) {
+      dummyRef.current.rotation.copy(meshRef.current.rotation);
+    }
 
     // Se o player cair abaixo de um limiar, aciona o Game Over
     if (pos.y < -10) {
@@ -104,34 +211,35 @@ const Player = forwardRef(({ playerName, playerColor, playerCar, multiplayer, on
       return;
     }
 
-    const speed = 5;
-    const movement = new THREE.Vector3();
+    // Atualiza a física do carro com base nos controles
+    const { movement, isUpsideDown } = updateCarPhysics(
+      keysRef.current, 
+      rigidBodyRef.current, 
+      meshRef.current, 
+      camera, 
+      delta
+    );
 
-    // Calcula a direção de movimento com base na orientação da câmera (no plano XZ)
-    const forwardVector = new THREE.Vector3();
-    camera.getWorldDirection(forwardVector);
-    forwardVector.y = 0;
-    forwardVector.normalize();
-
-    const rightVector = new THREE.Vector3();
-    rightVector.crossVectors(forwardVector, new THREE.Vector3(0, 1, 0)).normalize();
-
-    if (keysRef.current['w']) movement.add(forwardVector);
-    if (keysRef.current['s']) movement.sub(forwardVector);
-    if (keysRef.current['a']) movement.sub(rightVector);
-    if (keysRef.current['d']) movement.add(rightVector);
-
-    if (movement.length() > 0) {
-      movement.normalize().multiplyScalar(speed);
-      
-      // Rotaciona o modelo na direção do movimento
-      if (meshRef.current) {
-        const targetRotation = Math.atan2(movement.x, movement.z);
-        meshRef.current.rotation.y = targetRotation;
-      }
+    // Se o carro estiver de cabeça para baixo, aciona o Game Over
+    if (isUpsideDown) {
+      console.log('Car flipped! Game over.');
+      onGameOver?.();
+      return;
     }
 
-    // Preserva a componente vertical da velocidade
+    // Atualiza o HUD
+    if (onHUDUpdate) {
+      onHUDUpdate({
+        speed: currentSpeed,
+        isDrifting,
+        isFlying,
+        isUpsideDown,
+        position: { x: pos.x, z: pos.z },
+        rotation: meshRef.current ? meshRef.current.rotation.y : 0
+      });
+    }
+
+    // Aplica o movimento calculado, preservando a componente vertical da velocidade
     const currentVel = rigidBodyRef.current.linvel();
     rigidBodyRef.current.setLinvel(
       { x: movement.x, y: currentVel.y, z: movement.z },
@@ -141,7 +249,7 @@ const Player = forwardRef(({ playerName, playerColor, playerCar, multiplayer, on
     // Pulo: se espaço estiver pressionado e o player puder pular, aplica impulso vertical
     if (keysRef.current[' ']) {
       if (canJumpRef.current) {
-        rigidBodyRef.current.applyImpulse({ x: 0, y: 7, z: 0 }, true);
+        rigidBodyRef.current.applyImpulse({ x: 0, y: PLAYER_CONFIG.JUMP_FORCE, z: 0 }, true);
         canJumpRef.current = false;
       }
     }
@@ -153,12 +261,17 @@ const Player = forwardRef(({ playerName, playerColor, playerCar, multiplayer, on
   });
 
   // Funções de colisão para detectar contato com o chão e permitir pulo
-  const handleCollisionEnter = () => {
+  const handleCollisionEnter = (event) => {
     canJumpRef.current = true;
+    updateGroundedState(true);
+    
+    // Verifica se a colisão é com uma rampa
+    handleRampCollision(event, rigidBodyRef.current);
   };
 
   const handleCollisionExit = () => {
     canJumpRef.current = false;
+    updateGroundedState(false);
   };
 
   return (
@@ -166,10 +279,12 @@ const Player = forwardRef(({ playerName, playerColor, playerCar, multiplayer, on
       ref={rigidBodyRef}
       type="dynamic"
       colliders="cuboid"
-      friction={0}         // Baixa fricção
-      restitution={0.2}    // Restituição leve
-      canSleep={false}     // Mantém o corpo ativo
+      friction={0.3}      // Aumentada para melhor aderência
+      restitution={0.05}  // Reduzida para menos quicar
+      canSleep={false}    // Mantém o corpo ativo
       lockRotations={true} // Impede rotações indesejadas
+      linearDamping={0.7} // Aumentado para movimento mais suave
+      angularDamping={0.9} // Aumentado para reduzir oscilações
       onCollisionEnter={handleCollisionEnter}
       onCollisionExit={handleCollisionExit}
       position={[0, 2, 0]}  // Inicia o player acima da plataforma
@@ -186,7 +301,7 @@ const Player = forwardRef(({ playerName, playerColor, playerCar, multiplayer, on
         {/* Modelo do carro */}
         {!showDefaultMesh && (
           <Suspense fallback={null}>
-            <CarModel carId={playerCar} color={playerColor} />
+            <CarModelLoader carId={playerCar} color={playerColor} />
           </Suspense>
         )}
       </group>
@@ -204,6 +319,13 @@ const Player = forwardRef(({ playerName, playerColor, playerCar, multiplayer, on
           {playerName}
         </Text>
       </Billboard>
+      
+      {/* UI do carro */}
+      <CarUI 
+        isDrifting={isDrifting} 
+        isFlying={isFlying} 
+        speed={currentSpeed} 
+      />
     </RigidBody>
   );
 });

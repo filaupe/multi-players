@@ -1,0 +1,67 @@
+/* src/assets/styles/GameHUD.css */
+.game-hud {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 100;
+  font-family: 'Arial', sans-serif;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.speed-indicator {
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+  padding: 10px 15px;
+  display: inline-flex;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.speed-value {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.speed-unit {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.status-indicators {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.status-indicator {
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-weight: bold;
+  text-align: center;
+  animation: pulse 1s infinite alternate;
+}
+
+.status-indicator.drift {
+  background-color: rgba(255, 85, 0, 0.8);
+}
+
+.status-indicator.flying {
+  background-color: rgba(0, 170, 255, 0.8);
+}
+
+.status-indicator.danger {
+  background-color: rgba(255, 0, 0, 0.8);
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
